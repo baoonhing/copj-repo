@@ -1,12 +1,12 @@
 {
   "expo": {
     "name": "Co-work",
-    "slug": "Co-work",
+    "slug": "co-work",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "cowork",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "light",
     "ios": {
       "icon": "./assets/expo.icon"
     },

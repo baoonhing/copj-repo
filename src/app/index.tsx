@@ -1,14 +1,16 @@
 import { ThemedText } from "@/components/themed-text";
-import { AntDesign, FontAwesome, Ionicons } from "@expo/vector-icons";
+import { FontAwesome, Ionicons } from "@expo/vector-icons";
+import { useState} from "react";
 import * as Device from "expo-device";
-import { useState } from "react";
+import { router } from "expo-router";
 import {
+  Image,
   Platform,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 function getDevMenuHint() {
@@ -30,10 +32,24 @@ function getDevMenuHint() {
   );
 }
 
-export default function LoginEmailScreen() {
+export default function LoginEmailScreen({}) {
   const [email, setEmail] = useState("");
+  const [error, setError] = useState("");
   const handleContinue = () => {
-    console.log("Email entered:", email);
+    if (email.trim() === "") {
+      setError("Vui lòng nhập email");
+      return;
+    }
+    if (
+      !email.includes("@") ||
+      !email.includes("gmail") ||
+      !email.includes(".com")
+    ) {
+      setError("Email không hợp lệ");
+      return;
+    }
+    setError("");
+    router.push("/login1");
   };
   return (
     <SafeAreaView style={styles.container}>
@@ -53,6 +69,7 @@ export default function LoginEmailScreen() {
         autoCapitalize="none"
         autoCorrect={false}
       />
+      {error !== "" && <Text style={styles.errorText}>{error}</Text>}
       {/* Nút bấm Tiếp tục */}
       <TouchableOpacity
         style={styles.button}
@@ -68,18 +85,22 @@ export default function LoginEmailScreen() {
       </View>
       {/* tiep tuc voi google */}
       <TouchableOpacity
-        style={styles.buttonGoogle}
+        style={styles.buttonall}
         activeOpacity={0.8}
         onPress={handleContinue}
       >
         <View style={styles.iconContainer}>
-          <AntDesign name="google" size={20} color="#EA4335" />
+          <Image
+            source={require("@/assets/images/tabIcons/Google-icon.png")}
+            style={styles.googleIcon}
+            resizeMode="contain"
+          />
         </View>
         <Text style={styles.buttonText2}>Tiếp tục với Google</Text>
       </TouchableOpacity>
       {/* tiep tuc voi apple*/}
       <TouchableOpacity
-        style={styles.buttonApple}
+        style={styles.buttonall}
         activeOpacity={0.8}
         onPress={handleContinue}
       >
@@ -90,7 +111,7 @@ export default function LoginEmailScreen() {
       </TouchableOpacity>
       {/*tiep tuc voi SDT*/}
       <TouchableOpacity
-        style={styles.buttonApple}
+        style={styles.buttonall}
         activeOpacity={0.8}
         onPress={handleContinue}
       >
@@ -99,6 +120,11 @@ export default function LoginEmailScreen() {
         </View>
         <Text style={styles.buttonText2}>Tiếp tục với SĐT</Text>
       </TouchableOpacity>
+      <Text style={styles.Policy}>
+        Khi nhấn tiếp tục bạn sẽ đồng ý với
+        <Text style={styles.PolicyBold}> Điều khoản dịch vụ</Text> và
+        <Text style={styles.PolicyBold}> Chính sách bảo mật</Text> của chúng tôi
+      </Text>
     </SafeAreaView>
   );
 }
@@ -155,7 +181,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#ffffff",
     fontSize: 14,
-    fontWeight: "600",
+    fontFamily: "Inter",
   },
   dividerContainer: {
     flexDirection: "row",
@@ -173,52 +199,56 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#6b7280",
   },
-  buttonGoogle: {
-    backgroundColor: "#e5e7eb",
+  buttonall: {
     width: "100%",
-    borderRadius: 8,
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 1,
     height: 48,
+    backgroundColor: "#e5e7eb",
+    borderRadius: 8,
+    borderWidth: 1,
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 8,
     borderColor: "#e5e7eb",
-    flexDirection: "row",
-  },
-  buttonApple: {
-    backgroundColor: "#e5e7eb",
-    width: "100%",
-    borderRadius: 8,
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 1,
-    height: 48,
-    borderColor: "#e5e7eb",
-    marginBottom: 8,
-    flexDirection: "row",
+    position: "relative",
   },
   buttonText2: {
     textAlign: "left",
     color: "#000000",
     fontSize: 14,
-    fontFamily: "Medium",
+    fontFamily: "Inter",
     justifyContent: "center",
-  },
-  GoogleImage: {
-    width: 20,
-    height: 20,
-    marginRight: 10,
-  },
-  AppleImage: {
-    width: 20,
-    height: 20,
-    marginRight: 10,
+    marginLeft: 111,
   },
   iconContainer: {
-    width: 24,
-    height: 24,
+    position: "absolute",
+    width: 20,
+    height: 20,
+    left: 85,
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 10,
+    marginRight: 8,
+  },
+  googleIcon: {
+    width: 20,
+    height: 22,
+  },
+  Policy: {
+    width: "90%",
+    fontFamily: "Inter",
+    fontSize: 12,
+    color: "#828282",
+    marginTop: 36,
+    textAlign: "center",
+  },
+  PolicyBold: {
+    fontFamily: "Semi Bold",
+    fontSize: 12,
+    color: "#080808",
+  },
+  errorText: {
+    width: "100%",
+    color: "red",
+    fontSize: 12,
+    marginBottom: 8,
   },
 });
