@@ -62,8 +62,8 @@ const CustomNavBar = ({ state, descriptors, navigation }: any) => {
             onLongPress={onLongPress}
             style={styles.tab}
           >
-            {getIcon(route.name)}
-            <Text style={{ color: isFocused ? colors.primary : colors.text }}>
+            {getIcon(route.name, isFocused)}
+            <Text style={{ color: isFocused ? 'black' : '#8e8e93' }}>
               {label as string}
             </Text>
           </PlatformPressable>
@@ -72,18 +72,19 @@ const CustomNavBar = ({ state, descriptors, navigation }: any) => {
     </View>
   );
 
-  function getIcon(routename: string) {
+  function getIcon(routename: string, isFocused: boolean) {
+    const color = isFocused ? "black" : "#8e8e93"; // Đen khi active, xám khi inactive
     switch (routename) {
       case "homepage":
-        return <Ionicons name="home-outline" size={25} />;
+        return <Ionicons name={isFocused ? "home" : "home-outline"} size={25} color={color} />;
       case "chat":
-        return <Ionicons name="chatbubble-outline" size={25} />;
+        return <Ionicons name={isFocused ? "chatbubble" : "chatbubble-outline"} size={25} color={color} />;
       case "feedback":
-        return <Ionicons name="star-outline" size={25} />;
+        return <Ionicons name={isFocused ? "star" : "star-outline"} size={25} color={color} />;
       case "money":
-        return <Ionicons name="wallet-outline" size={25} />;
+        return <Ionicons name={isFocused ? "wallet" : "wallet-outline"} size={25} color={color} />;
       case "account":
-        return <Ionicons name="person-outline" size={25} />;
+        return <Ionicons name={isFocused ? "person" : "person-outline"} size={25} color={color} />;
     }
   }
 };
