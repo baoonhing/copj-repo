@@ -43,7 +43,7 @@ const CHAT_DATA: ChatItem[] = [
     lastMessage: 'Đã gửi một ảnh',
     online: true,
     hasUnreadDot: false,
-    avatar: 'https://i.pravatar.cc/150?u=tram',
+    avatar: 'https://theselfishmeme.co.uk/wp-content/uploads/2025/11/anh-avatar-zalo-mac-dinh-cute-2.webp',
     attachment: require('@/assets/images/cún.jpg'),
   },
   {
