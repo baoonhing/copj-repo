@@ -42,7 +42,7 @@ const CONVERSATIONS: Record<
     user: {
       name: 'Anh Minh',
       verified: false,
-      avatar: 'https://i.pravatar.cc/150?u=tram',
+      avatar: 'https://theselfishmeme.co.uk/wp-content/uploads/2025/11/anh-avatar-zalo-mac-dinh-cute-2.webp',
     },
     messages: [
       { id: '1', text: 'Chào bạn, chiều nay bạn có rảnh dắt cún đi dạo không?', isMe: false },
