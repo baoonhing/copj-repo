@@ -1,12 +1,12 @@
 {
   "expo": {
-    "name": "Co-work",
-    "slug": "co-work",
+    "name": "cowork-app",
+    "slug": "cowork-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "cowork",
-    "userInterfaceStyle": "light",
+    "scheme": "coworkapp",
+    "userInterfaceStyle": "automatic",
     "ios": {
       "icon": "./assets/expo.icon"
     },
@@ -21,8 +21,7 @@
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/favicon.png",
-      "bundler": "metro"
+      "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
       "expo-router",
@@ -38,13 +37,6 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    },
-    "extra": {
-      "router": {},
-      "eas": {
-        "projectId": "9611507d-eb6a-4c83-bede-b8eef14f1fda"
-      }
-    },
-    "owner": "baoonhi_ng"
+    }
   }
 }
