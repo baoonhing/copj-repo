@@ -15,6 +15,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -68,6 +69,89 @@ const task = [
     distance: "3 km",
   },
 ];
+
+// ===== Chế độ "Đăng việc làm" =====
+// Đổi đường dẫn nếu file nằm chỗ khác trong app/
+const POST_ROUTES = {
+  postJob: "/dangvclam", // dangvclam.tsx - màn Đăng việc
+  jobDetail: "/ChitietCV", // ChitietCV.tsx - chi tiết công việc
+};
+
+type PostedStatus = "recruiting" | "accepted" | "done";
+
+type PostedJob = {
+  id: string;
+  title: string;
+  price: string;
+  time: string;
+  postedAgo: string;
+  urgent?: boolean;
+  status: PostedStatus;
+  taskerAvatar?: any;
+};
+
+const POSTED_JOBS: PostedJob[] = [
+  {
+    id: "p1",
+    title: "Nhận hàng Shopee ở cổng sau KTX khu B",
+    price: "30.000đ",
+    time: "KHẨN CẤP - trước 15h00",
+    postedAgo: "12m ago",
+    urgent: true,
+    status: "recruiting",
+  },
+  {
+    id: "p2",
+    title: "Nhận giúp tài liệu photo và giao cho mình",
+    price: "27.000đ",
+    time: "14h00 - 17/09/2026",
+    postedAgo: "12h ago",
+    status: "accepted",
+    taskerAvatar: require("@/assets/images/Vy.png"),
+  },
+  {
+    id: "p3",
+    title: "Hỗ trợ chuyển phòng tòa D4 KTX khu B",
+    price: "80.000đ",
+    time: "9h00 - 29/08/2026",
+    postedAgo: "1 day ago",
+    status: "done",
+    taskerAvatar: require("@/assets/images/Trâm.png"),
+  },
+];
+
+const POSTED_STATUS = {
+  recruiting: { label: "Đang tuyển...", bg: "#E8D77A", color: "#444444" },
+  accepted: { label: "Có tasker nhận", bg: "#B7D0FF", color: "#1F3F8F" },
+  done: { label: "Hoàn thành", bg: "#C9F7B8", color: "#1C5A10" },
+};
+
+const TRUSTED_TASKERS = [
+  {
+    id: "t1",
+    name: "Bảo Nhi",
+    rating: "5.0",
+    rank: "kim cương",
+    avatar: require("@/assets/images/Nhi.png") as any,
+    months: "3m",
+    diamond: true,
+    online: false,
+  },
+  {
+    id: "t2",
+    name: "Anh Minh",
+    rating: "4.8",
+    rank: "Bạc",
+    avatar:
+      "https://theselfishmeme.co.uk/wp-content/uploads/2025/11/anh-avatar-zalo-mac-dinh-cute-2.webp" as any,
+    months: "",
+    diamond: false,
+    online: true,
+  },
+];
+
+const toSource = (img: any) => (typeof img === "string" ? { uri: img } : img);
+
 export default function SwitchMode() {
   const [selected, setSelected] = useState(0);
   const slideX = useRef(new Animated.Value(0)).current;
@@ -80,6 +164,15 @@ export default function SwitchMode() {
     }).start();
   };
   const displayTask = task.filter((task) => task.category === selectedCategory);
+
+  // Chế độ Đăng việc làm
+  const [postSearch, setPostSearch] = useState("");
+  const [postedJobs, setPostedJobs] = useState<PostedJob[]>(POSTED_JOBS);
+  const visiblePosted = postedJobs.filter((j) =>
+    j.title.toLowerCase().includes(postSearch.trim().toLowerCase()),
+  );
+  const handleDeletePosted = (id: string) =>
+    setPostedJobs((prev) => prev.filter((j) => j.id !== id));
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.switchmodeButton}>
@@ -323,9 +416,186 @@ export default function SwitchMode() {
           </ScrollView>
         </>
       ) : (
-        <ScrollView>
-          <Text>Đăng việc</Text>
-        </ScrollView>
+        <>
+          <View style={styles.search}>
+            <View style={styles.pSearch}>
+              <Ionicons name="search-outline" size={24} color="#828282" />
+              <TextInput
+                style={styles.pSearchInput}
+                placeholder="Tìm kiếm...."
+                placeholderTextColor="#828282"
+                value={postSearch}
+                onChangeText={setPostSearch}
+              />
+            </View>
+            <View style={{ marginLeft: 12 }}>
+              <Ionicons name="notifications-outline" size={35} color="black" />
+              <View style={styles.pBellDot} />
+            </View>
+          </View>
+
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+            contentContainerStyle={{ paddingBottom: 100 }}
+          >
+            {/* Banner quảng cáo */}
+            <View
+              style={{
+                width: "99%",
+                marginTop: 12,
+                borderRadius: 20,
+                overflow: "hidden",
+              }}
+            >
+              <Image
+                source={require("@/assets/images/18-pro-iphone.png")}
+                style={styles.AdButton}
+                resizeMode="cover"
+              />
+            </View>
+
+            {/* Nút Đăng việc ngay */}
+            <Text style={styles.pAsk}>Bạn cần giúp đỡ?</Text>
+            <TouchableOpacity
+              style={styles.pPostButton}
+              activeOpacity={0.8}
+              onPress={() => router.push(POST_ROUTES.postJob as never)}
+            >
+              <Ionicons name="add" size={28} color="#fff" />
+              <Text style={styles.pPostButtonText}>Đăng việc ngay</Text>
+            </TouchableOpacity>
+
+            {/* Lịch sử đăng việc */}
+            <View style={styles.pSectionHead}>
+              <Text style={styles.pSectionTitle}>Lịch sử đăng việc</Text>
+              <CircleArrowRight size={23} style={{ marginLeft: 12 }} />
+            </View>
+
+            {visiblePosted.map((job) => {
+              const st = POSTED_STATUS[job.status];
+              return (
+                <TouchableOpacity
+                  key={job.id}
+                  style={styles.pJob}
+                  activeOpacity={0.85}
+                  onPress={() =>
+                    router.push({
+                      pathname: POST_ROUTES.jobDetail,
+                      params: { id: job.id },
+                    } as never)
+                  }
+                >
+                  <View style={styles.cardHeader}>
+                    <View
+                      style={[
+                        styles.badgeWrapper,
+                        !job.urgent && { backgroundColor: "#FFF0A3" },
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.badgeText,
+                          !job.urgent && { color: "#6B4F00" },
+                        ]}
+                      >
+                        {job.time}
+                      </Text>
+                    </View>
+                    <Text style={styles.cardTime}>{job.postedAgo}</Text>
+                    <View style={styles.priceBadge}>
+                      <Text style={styles.priceText}>{job.price}</Text>
+                    </View>
+                  </View>
+
+                  <Text style={styles.cardTitle}>{job.title}</Text>
+
+                  <View style={styles.pJobBottom}>
+                    <View style={[styles.pStatus, { backgroundColor: st.bg }]}>
+                      {job.status === "accepted" && job.taskerAvatar && (
+                        <Image
+                          source={toSource(job.taskerAvatar)}
+                          style={styles.pStatusAvatar}
+                        />
+                      )}
+                      <Text style={{ fontSize: 13, color: st.color }}>
+                        {st.label}
+                      </Text>
+                    </View>
+                    {job.status === "done" && job.taskerAvatar && (
+                      <Image
+                        source={toSource(job.taskerAvatar)}
+                        style={styles.pDoneAvatar}
+                      />
+                    )}
+                    <View style={styles.pActions}>
+                      <TouchableOpacity
+                        hitSlop={8}
+                        onPress={() =>
+                          router.push({
+                            pathname: POST_ROUTES.postJob,
+                            params: { id: job.id },
+                          } as never)
+                        }
+                      >
+                        <Ionicons name="create-outline" size={24} color="#000" />
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        hitSlop={8}
+                        onPress={() => handleDeletePosted(job.id)}
+                      >
+                        <Ionicons name="trash-outline" size={24} color="#B30000" />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              );
+            })}
+            {visiblePosted.length === 0 && (
+              <Text style={styles.emptyText}>
+                Chưa có việc nào. Bấm “Đăng việc ngay” để bắt đầu.
+              </Text>
+            )}
+
+            {/* Taskers uy tín gần đây */}
+            <View style={styles.pSectionHead}>
+              <Text style={styles.pSectionTitle}>Taskers uy tín gần đây</Text>
+              <CircleArrowRight size={23} style={{ marginLeft: 12 }} />
+            </View>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              {TRUSTED_TASKERS.map((t) => {
+                const color = t.diamond ? "#14A7C4" : "#666";
+                return (
+                  <View
+                    key={t.id}
+                    style={[
+                      styles.pTasker,
+                      { backgroundColor: t.diamond ? "#E6F7F9" : "#E6E6E6" },
+                    ]}
+                  >
+                    <View style={{ width: 56, height: 56 }}>
+                      <Image source={toSource(t.avatar)} style={styles.pAvatar} />
+                      {!!t.months && (
+                        <View style={styles.pMonths}>
+                          <Text style={{ fontSize: 11, color: "#2D6A3A" }}>
+                            {t.months}
+                          </Text>
+                        </View>
+                      )}
+                      {t.online && <View style={styles.pOnline} />}
+                    </View>
+                    <View style={{ marginLeft: 12 }}>
+                      <Text style={styles.footerUser}>{t.name}</Text>
+                      <Text style={{ fontSize: 12, marginTop: 4, color }}>
+                        ★ {t.rating} ({t.rank})
+                      </Text>
+                    </View>
+                  </View>
+                );
+              })}
+            </ScrollView>
+          </ScrollView>
+        </>
       )}
     </SafeAreaView>
   );
@@ -536,5 +806,143 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: "#888",
     marginVertical: 20,
+  },
+  // ----- Chế độ Đăng việc làm -----
+  pSearch: {
+    backgroundColor: "#E6E6E6",
+    width: 320,
+    height: 40,
+    borderRadius: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 12,
+    gap: 10,
+  },
+  pSearchInput: {
+    flex: 1,
+    fontSize: 14,
+    fontFamily: "Inter",
+    color: "#000",
+    padding: 0,
+  },
+  pBellDot: {
+    position: "absolute",
+    top: 3,
+    right: 5,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: "#D40000",
+  },
+  pAsk: {
+    marginTop: 18,
+    marginLeft: 6,
+    marginBottom: 10,
+    fontSize: 16,
+    fontFamily: "Inter",
+    fontWeight: "600",
+    color: "#000",
+  },
+  pPostButton: {
+    height: 52,
+    borderRadius: 50,
+    backgroundColor: "#2C2C2C",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+  },
+  pPostButtonText: {
+    color: "#fff",
+    fontSize: 18,
+    fontFamily: "Inter",
+  },
+  pSectionHead: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 20,
+    marginBottom: 12,
+    marginLeft: 6,
+  },
+  pSectionTitle: {
+    fontSize: 17,
+    fontFamily: "Inter",
+    fontWeight: "600",
+    color: "#000",
+  },
+  pJob: {
+    backgroundColor: "#EFEFEF",
+    borderWidth: 1.5,
+    borderColor: "#000",
+    borderRadius: 18,
+    padding: 14,
+    marginBottom: 12,
+  },
+  pJobBottom: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginTop: 4,
+  },
+  pStatus: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 5,
+    borderRadius: 50,
+  },
+  pStatusAvatar: {
+    position: "absolute",
+    left: -8,
+    top: -8,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 1.5,
+    borderColor: "#fff",
+  },
+  pDoneAvatar: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+  },
+  pActions: {
+    marginLeft: "auto",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 20,
+  },
+  pTasker: {
+    width: 240,
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 10,
+    borderRadius: 18,
+    marginRight: 12,
+  },
+  pAvatar: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: "#e1e1e1",
+  },
+  pMonths: {
+    position: "absolute",
+    bottom: -2,
+    right: -4,
+    paddingHorizontal: 7,
+    borderRadius: 50,
+    backgroundColor: "#BFF0C8",
+  },
+  pOnline: {
+    position: "absolute",
+    bottom: 0,
+    right: 0,
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    backgroundColor: "#34c759",
+    borderWidth: 2,
+    borderColor: "#fff",
   },
 });
